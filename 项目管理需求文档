@@ -1,0 +1,203 @@
+
+# 📋 **英语教培机构销售团队项目管理系统 - 技术需求文档**
+
+## 1. 项目概述 (Overview)
+
+开发一个专为英语教培机构销售负责人设计的项目管理web应用，支持活动策划、培训计划、工作任务、面谈计划等多种项目类型的管理，通过卡片式看板和丰富的图表展示实现高效的任务分配、进度跟踪和时间管理。
+
+## 2. 核心功能点 (Core Features)
+
+- ✅ **多项目并行管理**：支持同时管理多个不同类型的项目
+- ✅ **任务层级管理**：项目 → 子任务的二级结构
+- ✅ **任务状态跟踪**：待办 → 进行中 → 已完成的状态流转
+- ✅ **优先级与时间管理**：任务优先级设置、截止日期提醒
+- ✅ **人员分配管理**：按人员、部门维度的任务分配
+- ✅ **每日TodoList**：个性化的日常任务清单
+- ✅ **多维度数据可视化**：看板、甘特图、统计图表
+- ✅ **数据持久化**：长期保存项目数据，支持手动清理
+
+## 3. 技术规格 (Technical Specifications)
+
+### 3.1 前端 (Frontend)
+
+#### **页面/组件 (Pages/Components):**
+
+1. **主控制台页面 (Dashboard)**
+   - 项目概览卡片
+   - 今日任务快速视图
+   - 关键指标统计
+
+2. **项目管理页面 (Projects)**
+   - 项目列表视图
+   - 项目创建/编辑模态框
+   - 项目详情页（含子任务管理）
+
+3. **看板页面 (Kanban Board)**
+   - 三列式看板：待办 | 进行中 | 已完成
+   - 任务卡片组件（可拖拽）
+   - 任务快速编辑
+
+4. **每日TodoList页面 (Daily Tasks)**
+   - 按人员分组的任务列表
+   - 按部门筛选功能
+   - 任务完成度展示
+
+5. **数据报表页面 (Analytics)**
+   - 甘特图组件
+   - 柱状图、饼图、线图组件
+   - 进度统计表格
+
+6. **公共组件 (Shared Components)**
+   - 导航栏 (Navbar)
+   - 任务卡片 (TaskCard)
+   - 日期选择器 (DatePicker)
+   - 优先级标签 (PriorityBadge)
+   - 状态指示器 (StatusIndicator)
+
+#### **用户流程 (User Flow):**
+
+```
+启动应用 → 主控制台 
+    ↓
+选择功能模块：
+    → 项目管理：创建项目 → 添加子任务 → 设置优先级/截止日期 → 分配人员
+    → 看板视图：拖拽任务卡片 → 更新状态 → 查看进度
+    → 每日TodoList：按人员查看 → 标记完成 → 更新进度
+    → 数据报表：选择图表类型 → 筛选数据 → 导出报告
+```
+
+#### **数据交互 (Data Interaction):**
+
+- **请求数据：** 项目列表、任务详情、人员信息、统计数据
+- **发送数据：** 新建/更新项目、任务状态变更、优先级调整、完成度更新
+
+### 3.2 后端 (Backend)
+
+#### **API 接口 (API Endpoints):**
+
+```
+项目管理相关：
+GET    /api/projects              # 获取所有项目列表
+POST   /api/projects              # 创建新项目
+PUT    /api/projects/{id}         # 更新项目信息
+DELETE /api/projects/{id}         # 删除项目
+
+任务管理相关：
+GET    /api/projects/{id}/tasks   # 获取项目下的所有任务
+POST   /api/projects/{id}/tasks   # 创建新任务
+PUT    /api/tasks/{id}            # 更新任务信息
+DELETE /api/tasks/{id}            # 删除任务
+PATCH  /api/tasks/{id}/status     # 更新任务状态
+
+数据统计相关：
+GET    /api/analytics/overview    # 获取总体统计数据
+GET    /api/analytics/gantt       # 获取甘特图数据
+GET    /api/analytics/daily       # 获取每日TodoList数据
+GET    /api/analytics/person/{person} # 获取个人任务统计
+
+系统功能相关：
+DELETE /api/system/clear          # 清空所有数据（慎用）
+GET    /api/system/backup         # 数据备份导出
+```
+
+#### **数据模型 (Data Models):**
+
+```javascript
+// 项目表 (Projects)
+{
+  id: "唯一标识符",
+  name: "项目名称",
+  type: "项目类型(活动策划/培训计划/工作任务/面谈计划)",
+  description: "项目描述",
+  status: "项目状态(active/completed/archived)",
+  created_at: "创建时间",
+  updated_at: "更新时间"
+}
+
+// 任务表 (Tasks)
+{
+  id: "唯一标识符", 
+  project_id: "所属项目ID",
+  title: "任务标题",
+  description: "任务描述",
+  priority: "优先级(high/medium/low)", 
+  status: "任务状态(todo/in_progress/completed)",
+  assigned_to: "负责人",
+  department: "所属部门",
+  due_date: "截止日期",
+  completed_at: "完成时间",
+  created_at: "创建时间",
+  updated_at: "更新时间"
+}
+
+// 人员表 (Personnel)
+{
+  id: "唯一标识符",
+  name: "姓名", 
+  department: "部门",
+  role: "职位",
+  active: "是否在职"
+}
+```
+
+## 4. 技术栈建议 (Tech Stack Suggestion)
+
+考虑到你是初学者，我推荐以下相对简单但功能强大的技术栈：
+
+**前端：**
+- **Vue.js 3** + **Composition API** (现代、易学的前端框架)
+- **Element Plus** (提供丰富的UI组件，包括图表组件)
+- **Vue Router** (页面路由管理)
+- **Pinia** (状态管理，比Vuex更简单)
+- **Vue Draggable** (拖拽功能实现)
+- **Day.js** (日期处理库)
+
+**后端：**
+- **Python Flask** (轻量级、易学的web框架)
+- **SQLite** (轻量级数据库，无需额外配置)
+- **SQLAlchemy** (数据库ORM，简化数据操作)
+- **Flask-CORS** (处理跨域请求)
+
+**工具：**
+- **Vite** (前端构建工具，快速开发)
+- **Postman** (API测试工具)
+
+## 5. 开发步骤建议 (Development Steps)
+
+### **阶段一：基础框架搭建 (1-2周)**
+1. ✅ 搭建Vue.js前端项目，安装必要依赖
+2. ✅ 创建Flask后端项目，设置基础路由
+3. ✅ 设计数据库表结构，创建模型文件
+4. ✅ 实现前后端基础连接测试
+
+### **阶段二：项目管理核心功能 (2-3周)**
+5. ✅ 实现项目CRUD功能（创建、读取、更新、删除）
+6. ✅ 实现任务CRUD功能
+7. ✅ 开发项目列表页面和项目详情页面
+8. ✅ 添加任务优先级和截止日期功能
+
+### **阶段三：看板和状态管理 (2周)**
+9. ✅ 开发三列式看板界面
+10. ✅ 实现任务卡片拖拽功能
+11. ✅ 实现任务状态自动更新
+12. ✅ 添加任务快速编辑功能
+
+### **阶段四：TodoList和人员管理 (1-2周)**
+13. ✅ 开发每日TodoList页面
+14. ✅ 实现按人员、部门的任务筛选
+15. ✅ 添加人员管理功能
+16. ✅ 实现任务分配功能
+
+### **阶段五：数据可视化 (2-3周)**
+17. ✅ 集成图表库，实现基础图表展示
+18. ✅ 开发甘特图功能
+19. ✅ 实现项目进度统计
+20. ✅ 创建数据报表页面
+
+### **阶段六：优化和完善 (1-2周)**
+21. ✅ 添加数据导入/导出功能
+22. ✅ 实现系统数据清理功能
+23. ✅ 优化界面响应式设计
+24. ✅ 添加快捷键和提醒功能
+25. ✅ 全面测试和bug修复
+

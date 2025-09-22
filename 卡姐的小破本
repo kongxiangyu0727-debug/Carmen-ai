@@ -1,0 +1,97 @@
+App.vue
+├── LeftSidebar.vue (笔记列表区域)
+│   ├── SearchBar.vue (搜索框)
+│   ├── TagFilter.vue (标签筛选)
+│   └── NoteList.vue (笔记列表)
+├── MainEditor.vue (编辑器区域)
+│   ├── NoteEditor.vue (文本编辑器)
+│   ├── AIToolbar.vue (AI 工具栏)
+│   └── ModelSelector.vue (模型选择器)
+└── TagManager.vue (标签管理弹窗)
+// 1. 文本续写
+POST https://openrouter.ai/api/v1/chat/completions
+Headers: {
+  "Authorization": "Bearer YOUR_API_KEY",
+  "Content-Type": "application/json"
+}
+Body: {
+  "model": "anthropic/claude-3-sonnet", // 或 openai/gpt-4, deepseek/deepseek-chat
+  "messages": [
+    {"role": "user", "content": "续写以下文本：[用户现有文本]"}
+  ],
+  "max_tokens": 500
+}
+
+// 2. 文本润色
+Body: {
+  "model": "openai/gpt-4",
+  "messages": [
+    {"role": "user", "content": "请润色以下文本，保持原意：[选中文本]"}
+  ]
+}
+
+// 3. 智能摘要
+Body: {
+  "model": "anthropic/claude-3-sonnet",
+  "messages": [
+    {"role": "user", "content": "请为以下文本生成摘要和关键点：[完整文本]"}
+  ]
+}
+// 笔记表 (notes)
+{
+  id: "uuid", // 唯一标识
+  title: "string", // 笔记标题（取内容前50字符）
+  content: "string", // 笔记正文
+  tags: ["tag1", "tag2"], // 标签数组
+  created_at: "timestamp", // 创建时间
+  updated_at: "timestamp", // 最后修改时间
+  ai_summary: "string" // AI生成的摘要（可选）
+}
+
+// 标签表 (tags)
+{
+  id: "uuid",
+  name: "string", // 标签名
+  color: "string", // 标签颜色（hex）
+  created_at: "timestamp"
+}
+
+// 设置表 (settings)
+{
+  id: "user_settings",
+  preferred_model: "anthropic/claude-3-sonnet", // 默认AI模型
+  openrouter_api_key: "string", // 用户的OpenRouter API密钥
+  auto_save_interval: 2000 // 自动保存间隔（毫秒）
+}
+前端框架：Vue 3 + Composition API
+UI 组件库：Element Plus（商务风格，符合需求）
+状态管理：Pinia
+本地存储：Dexie.js（IndexedDB 封装库）
+富文本编辑：CodeMirror 6（纯文本模式，支持语法高亮）
+HTTP 客户端：Axios
+构建工具：Vite
+样式预处理：SCSS
+npm create vue@latest ai-notepad
+cd ai-notepad
+npm install element-plus dexie axios
+// Tab 键续写
+onKeyDown(event) {
+  if (event.key === 'Tab' && !event.shiftKey) {
+    event.preventDefault();
+    this.triggerAIContinuation();
+  }
+}
+
+// 右键菜单
+onContextMenu(event) {
+  if (this.hasSelectedText()) {
+    this.showAIContextMenu(event.clientX, event.clientY);
+  }
+}
+// 防抖自动保存
+const debouncedSave = debounce(async (noteId, content) => {
+  await db.notes.update(noteId, { 
+    content, 
+    updated_at: new Date() 
+  });
+}, 2000);
