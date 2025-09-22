@@ -76,7 +76,7 @@ const menuItems = [
   },
   {
     id: 'chat',
-    label: 'AI对话',
+    label: 'AI副驾',
     icon: '🤖',
     action: () => switchTab('chat')
   },
